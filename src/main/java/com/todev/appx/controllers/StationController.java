@@ -53,7 +53,7 @@ public class StationController {
      */
     @JsonView(Views.BasicStation.class)
     @RequestMapping(value = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<Station> getStationsJson() {
+    public List<Station> getStations() {
         return stationRepository.findAll();
     }
 
@@ -64,7 +64,7 @@ public class StationController {
      */
     @JsonView(Views.DetailStation.class)
     @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Station getStationJson(@PathVariable long id) {
+    public Station getStation(@PathVariable long id) {
         final Station station = stationRepository.findById(id);
         final Set<Program> programs = station.getPrograms();
         station.setPrograms(Sets.filter(programs, filterCurrent));

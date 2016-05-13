@@ -112,7 +112,7 @@ Returns a list of ongoing programs. Related to the given timestamp.
 
 An example of request:
 
-> curl "http://localhost:8080/programs.json?time=`date -I`T21:00:00%2B0200"
+> curl "http://localhost:8080/programs.json?time=\`date -I\`T21:00:00%2B0200"
 
 An example of response:
 

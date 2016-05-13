@@ -41,7 +41,7 @@ public class ProgramController {
      */
     @JsonView(Views.DetailProgram.class)
     @RequestMapping(value = "", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public List<Program> getProgramsJson(
+    public List<Program> getPrograms(
         @RequestParam(value = "time") @DateTimeFormat(pattern = DateTimeSerializer.ISO_8601_FORMAT) DateTime time) {
         final List<Program> programs = programRepository.findAll();
         filterOngoing(programs, time);
