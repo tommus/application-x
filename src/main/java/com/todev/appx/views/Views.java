@@ -4,6 +4,9 @@ package com.todev.appx.views;
  * Created by Tomasz Dzieniak on 13.05.16.
  */
 public class Views {
+    public static class Invisible {
+    }
+
     public static class BasicStation {
     }
 

@@ -3,13 +3,22 @@ package com.todev.appx.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.todev.appx.serializers.DateTimeSerializer;
+import com.fasterxml.jackson.datatype.joda.ser.DateTimeSerializer;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+import com.todev.appx.serializers.DateTimeDeserializer;
 import com.todev.appx.views.Views;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 /**
  * Created by Tomasz Dzieniak on 13.05.16.
@@ -21,22 +30,35 @@ public class Program {
     @JsonIgnore
     private long id;
 
+    @JsonView({Views.BasicProgram.class, Views.DetailStation.class})
+    private String name;
+
+    @JsonView({Views.BasicProgram.class, Views.DetailStation.class})
+    private String brief;
+
+    @JsonDeserialize(using = DateTimeDeserializer.class)
+    @JsonProperty(value = "start_time")
+    @JsonSerialize(using = DateTimeSerializer.class)
+    @JsonView({Views.ScheduleProgram.class, Views.DetailStation.class})
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime startAt;
 
+    @JsonView(Views.Invisible.class)
+    private int duration;
+
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Station station;
 
+    @JsonProperty(value = "time_passed")
+    @JsonView(Views.DetailProgram.class)
     @Transient
     private long sinceStart;
 
+    @JsonProperty(value = "time_left")
+    @JsonView(Views.DetailProgram.class)
     @Transient
     private long tillEnd;
-
-    private String name;
-    private String brief;
-    private int duration;
 
     public Program() {
         // Default constructor for Hibernate.
@@ -58,7 +80,6 @@ public class Program {
 //        this.id = id;
 //    }
 
-    @JsonView({Views.BasicProgram.class, Views.DetailStation.class})
     public String getName() {
         return name;
     }
@@ -67,7 +88,6 @@ public class Program {
         this.name = name;
     }
 
-    @JsonView({Views.BasicProgram.class, Views.DetailStation.class})
     public String getBrief() {
         return brief;
     }
@@ -76,9 +96,6 @@ public class Program {
         this.brief = brief;
     }
 
-    @JsonProperty(value = "start_time")
-    @JsonSerialize(using = DateTimeSerializer.class)
-    @JsonView({Views.ScheduleProgram.class, Views.DetailStation.class})
     public DateTime getStartAt() {
         return startAt;
     }
@@ -87,7 +104,6 @@ public class Program {
         this.startAt = startAt;
     }
 
-    @JsonIgnore
     public int getDuration() {
         return duration;
     }
@@ -96,7 +112,6 @@ public class Program {
         this.duration = duration;
     }
 
-    @JsonIgnore
     public Station getStation() {
         return station;
     }
@@ -105,8 +120,6 @@ public class Program {
         this.station = station;
     }
 
-    @JsonProperty(value = "time_passed")
-    @JsonView(Views.DetailProgram.class)
     public long getSinceStart() {
         return sinceStart;
     }
@@ -115,13 +128,64 @@ public class Program {
         this.sinceStart = sinceStart;
     }
 
-    @JsonProperty(value = "time_left")
-    @JsonView(Views.DetailProgram.class)
     public long getTillEnd() {
         return tillEnd;
     }
 
     public void setTillEnd(long tillEnd) {
         this.tillEnd = tillEnd;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(
+            getId(),
+            getName(),
+            getBrief(),
+            getStartAt(),
+            getDuration(),
+            getSinceStart(),
+            getTillEnd()
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Program)) {
+            return false;
+        }
+
+        final Program other = (Program) obj;
+
+        return Objects.equal(getId(), other.getId())
+            && Objects.equal(getName(), other.getName())
+            && Objects.equal(getBrief(), other.getBrief())
+            && Objects.equal(getStartAt(), other.getStartAt())
+            && Objects.equal(getDuration(), other.getDuration())
+            && Objects.equal(getStation(), other.getStation())
+            && Objects.equal(getSinceStart(), other.getSinceStart())
+            && Objects.equal(getTillEnd(), other.getTillEnd());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(Program.class)
+            .add("id", getId())
+            .add("name", getName())
+            .add("brief", getBrief())
+            .add("start_at", getStartAt().toString())
+            .add("duration", getDuration())
+            .add("station", getStation().getName())
+            .add("time_passed", getSinceStart())
+            .add("time_left", getTillEnd())
+            .toString();
     }
 }

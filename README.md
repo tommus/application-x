@@ -34,16 +34,26 @@ Application can be compiled using `Gradle` build system.
 
     > java -jar build/libs/gs-rest-service-0.1.0.jar
 
+4. To run unit tests, just type:
+
+    > gradle test
+
 Above has been assumed that, the alternatives to `gradle` and `java` executables are
 available in system path.
 
 ##### Goal
 
-Evaluation consists of implementing the following:
+First evaluation consists of implementing the following:
 
 - an endpoint that allows to receive available TV stations,
 - an endpoint that allows to receive details information about selected TV station,
 - an endpoint that allows to receive a list of ongoing programs at given time.
+
+Second evaluation assumes the following updates:
+
+- an implementation of other CRUD (exactly: C, U, D) methods for programs manipulation,
+- an implementation of unit tests for service,
+- optimization of `program` table.
 
 ##### Implemented endpoints
 
@@ -94,15 +104,72 @@ An example of response:
             {
                 "brief": "Codzienny serwis informacyjny z prognoz\u0105 pogody.",
                 "name": "Pogoda",
-                "start_time": "2016-05-13T17:00:00+0200"
+                "start_time": "1463151600000"
             },
             {
                 "brief": "Popularny program rozrywkowy.",
                 "name": "Jaka to melodia?",
-                "start_time": "2016-05-13T17:25:00+0200"
+                "start_time": "1463153100000"
             }
         ]
     }
+
+A `/stations/{id}/schedule` endpoint:
+
+> /stations/{id}/schedule[.json/.xml]
+
+Allows to schedule new `program`s for selected `station`.
+
+An example of request, which adds new program for station of ID equals to 1:
+
+    curl -H "Content-Type: application/json" -X POST \
+          -d '{ "name": "Pogromcy mitów", "brief": "Program popularno-naukowy.", "duration": 70, "start_time": "1463158394000" }' \
+          http://localhost:8080/stations/1/schedule.json
+
+An example of response:
+
+    {
+        "brief": "Program popularnonaukowy.",
+        "duration": 70,
+        "name": "Pogromcy mitow",
+        "start_time": 1463158394000,
+        "time_left": 0,
+        "time_passed": 0
+    }
+
+A `/stations/{station_id}/schedule/{start_time}` endpoint:
+
+> /stations/{station_id}/schedule/{start_time}[.json/.xml]
+
+Allows to delete and update scheduled programs.
+
+An example of request that deletes program:
+
+> curl -X DELETE http://localhost:8080/stations/1/schedule/1463153100000
+
+It deletes a program scheduled in station of ID = 1 at time = 1463153100000.
+
+Successful deletion returns a HTTP 204 NOT FOUND code.
+
+An example of request that updates program:
+
+    curl -H "Content-Type: application/json" -X PUT \
+    -d '{ "name": "Nowa prognoza", "brief": "Ulepszona formula prognozy pogody.", "duration": 10, "start_time": "1463152200000" }' \
+    http://localhost:8080/stations/1/schedule/1463151600000
+
+An example of response:
+
+    {
+        "brief": "Ulepszona formula prognozy pogody.",
+        "duration": 10,
+        "name": "Nowa prognoza",
+        "start_time": 1463152200000,
+        "time_left": 0,
+        "time_passed": 0
+    }
+
+Above request has updated a program that starts at given time in station of ID = 1.
+Successful update returns a HTTP 200 OK code with corresponding object details.
 
 A `/programs` endpoint:
 
@@ -112,7 +179,7 @@ Returns a list of ongoing programs. Related to the given timestamp.
 
 An example of request:
 
-> curl "http://localhost:8080/programs.json?time=\`date -I\`T21:00:00%2B0200"
+> curl "http://localhost:8080/programs.json?time=1463166000000"
 
 An example of response:
 
@@ -131,7 +198,11 @@ An example of response:
         }
     ]
 
-It is worth to notice that, query parameter `time` should be escaped [ISO8601](https://www.w3.org/TR/NOTE-datetime) - formatted string.
+It is worth to notice that, query parameter `time` should be POSIX-formatted.
+
+Note that to get UNIX timestamp from specific date you can use the command:
+
+> echo $(($(date --date='05/13/2016 17:00:00' +"%s")*1000))
 
 ##### Pretty print
 

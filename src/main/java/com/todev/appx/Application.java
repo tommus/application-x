@@ -21,6 +21,7 @@ public class Application {
 
     /**
      * Application entry point.
+     *
      * @param args command-line arguments.
      */
     public static void main(String[] args) {
@@ -29,6 +30,7 @@ public class Application {
 
     /**
      * This method populates service's repositories with testable data.
+     *
      * @param programRepository an instance of {@link ProgramRepository} repository.
      * @param stationRepository an instance of {@link StationRepository} repository.
      * @return {@link CommandLineRunner} bean.
@@ -101,6 +103,14 @@ public class Application {
                 new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 20, 40),
                 "Film o dwóch bohaterach Marsylii - komisarzu Emilienie i taksówkarzu Danielu.",
                 "Taxi"
+            ));
+
+            programRepository.save(new Program(
+                polsat,
+                110,
+                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 23, 40),
+                "Dorośli Jaś i Małgosia stali się łowcami czarownic.",
+                "Jaś i Małgosia: Łowcy czarownic"
             ));
 
             LOG.info("Programs has been added.");

@@ -3,12 +3,10 @@ package com.todev.appx.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.todev.appx.models.Program;
 import com.todev.appx.repositories.ProgramRepository;
-import com.todev.appx.serializers.DateTimeSerializer;
 import com.todev.appx.views.Views;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +25,7 @@ public class ProgramController {
 
     /**
      * Create a new ProgramController.
+     *
      * @param programRepository a related {@link ProgramRepository} repository.
      */
     @Autowired
@@ -36,22 +35,24 @@ public class ProgramController {
 
     /**
      * Handler method for a /programs endpoint.
+     *
      * @param time a point in time ({@link DateTime}) that should be used to retrieve ongoing programs.
      * @return a collection of ongoing programs (related to given time).
      */
     @JsonView(Views.DetailProgram.class)
     @RequestMapping(value = "", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public List<Program> getPrograms(
-        @RequestParam(value = "time") @DateTimeFormat(pattern = DateTimeSerializer.ISO_8601_FORMAT) DateTime time) {
+        @RequestParam(value = "time") long time) {
         final List<Program> programs = programRepository.findAll();
-        filterOngoing(programs, time);
+        filterOngoing(programs, new DateTime(time));
         return programs;
     }
 
     /**
      * Filters a collection of programs. Leaves only these are ongoing at given time.
+     *
      * @param programs a collection of programs that should be filtered.
-     * @param time a point in time that should be used to filter programs.
+     * @param time     a point in time that should be used to filter programs.
      */
     private void filterOngoing(List<Program> programs, DateTime time) {
         final Iterator<Program> iterator = programs.iterator();
