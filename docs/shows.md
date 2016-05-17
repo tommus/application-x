@@ -17,7 +17,7 @@ Body parameters:
 | Parameter     | Required | Description         |
 |:--------------|:--------:|:--------------------|
 | **name**      | yes      | Show's name.        |
-| **bief**      | yes      | Show's description. |
+| **brief**     | yes      | Show's description. |
 | **duration**  | yes      | Show's duration.    |
 
 Response codes:
