@@ -1,9 +1,11 @@
 package com.todev.appx;
 
 import com.todev.appx.models.Program;
+import com.todev.appx.models.Show;
 import com.todev.appx.models.Station;
-import com.todev.appx.repositories.ProgramRepository;
-import com.todev.appx.repositories.StationRepository;
+import com.todev.appx.repositories.ProgramsRepository;
+import com.todev.appx.repositories.ShowsRepository;
+import com.todev.appx.repositories.StationsRepository;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -31,86 +33,70 @@ public class Application {
     /**
      * This method populates service's repositories with testable data.
      *
-     * @param programRepository an instance of {@link ProgramRepository} repository.
-     * @param stationRepository an instance of {@link StationRepository} repository.
+     * @param stations an instance of {@link StationsRepository} repository.
+     * @param shows    an instance of {@link ShowsRepository} repository.
+     * @param programs an instance of {@link ProgramsRepository} repository.
      * @return {@link CommandLineRunner} bean.
      */
     @Bean
-    CommandLineRunner init(ProgramRepository programRepository, StationRepository stationRepository) {
+    CommandLineRunner init(StationsRepository stations, ShowsRepository shows, ProgramsRepository programs) {
         return (evt) -> {
             final LocalDate today = LocalDate.now();
-            final Station tvp1 = new Station("TVP1");
-            final Station tvp2 = new Station("TVP2");
-            final Station polsat = new Station("Polsat");
 
-            stationRepository.save(tvp1);
-            stationRepository.save(tvp2);
-            stationRepository.save(polsat);
-
+            final Station foo = new Station("Foo");
+            final Station bar = new Station("Bar");
+            final Station ban = new Station("Ban");
+            stations.save(foo);
+            stations.save(bar);
+            stations.save(ban);
             LOG.info("Stations has been added.");
 
-            programRepository.save(new Program(
-                tvp1,
-                10,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 17, 0),
-                "Codzienny serwis informacyjny z prognozą pogody.",
-                "Pogoda"
+            final Show weather = new Show("Weather Forecast", "Everyday weather forecast.", 10);
+            final Show melody = new Show("Melody Trivia", "Popular entertainment program.", 25);
+            final Show friends = new Show("Friends", "Group of buddies goes through massive mayhem.", 25);
+            final Show news = new Show("News", "Daily dose of information.", 20);
+            final Show got = new Show("Game of Thrones", "Winter is coming.", 55);
+            final Show taxi = new Show("Taxi", "A skilled pizza delivery boy tries to work off his driving record.", 86);
+            final Show hag = new Show("Hansel and Gretel: Witch Hunt", "Bounty hunters tracks and kills witches.", 88);
+            shows.save(weather);
+            shows.save(melody);
+            shows.save(friends);
+            shows.save(news);
+            shows.save(got);
+            shows.save(taxi);
+            shows.save(hag);
+            LOG.info("Shows has been added.");
+
+            programs.save(new Program(
+                foo, weather, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 17, 0)
             ));
 
-            programRepository.save(new Program(
-                tvp1,
-                25,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 17, 25),
-                "Popularny program rozrywkowy.",
-                "Jaka to melodia?"
+            programs.save(new Program(
+                foo, melody, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 17, 25)
             ));
 
-            programRepository.save(new Program(
-                tvp2,
-                40,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 15, 0),
-                "Polski serial komediowy w reżyserii Patricka Yoki, emitowany od 2 marca 2011 w TVP2",
-                "Rodzinka.pl"
+            programs.save(new Program(
+                bar, friends, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 15, 0)
             ));
 
-            programRepository.save(new Program(
-                tvp2,
-                20,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 15, 40),
-                "Program informacyjny - codzienny przegląd zdarzeń w kraju.",
-                "Panorama - kraj"
+            programs.save(new Program(
+                bar, news, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 15, 40)
             ));
 
-            programRepository.save(new Program(
-                tvp2,
-                65,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 20, 40),
-                "Adam organizuje dla Wiktorii imprezę urodzinową.",
-                "Na dobre i na złe"
+            programs.save(new Program(
+                bar, got, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 20, 40)
             ));
 
-            programRepository.save(new Program(
-                polsat,
-                5,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 16, 10),
-                "Codzienny serwis informacyjny z progrnozą pogody.",
-                "Pogoda"
+            programs.save(new Program(
+                ban, weather, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 16, 10)
             ));
 
-            programRepository.save(new Program(
-                polsat,
-                60,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 20, 40),
-                "Film o dwóch bohaterach Marsylii - komisarzu Emilienie i taksówkarzu Danielu.",
-                "Taxi"
+            programs.save(new Program(
+                ban, taxi, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 20, 40)
             ));
 
-            programRepository.save(new Program(
-                polsat,
-                110,
-                new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 23, 40),
-                "Dorośli Jaś i Małgosia stali się łowcami czarownic.",
-                "Jaś i Małgosia: Łowcy czarownic"
+            programs.save(new Program(
+                ban, hag, new DateTime(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth(), 23, 40)
             ));
 
             LOG.info("Programs has been added.");

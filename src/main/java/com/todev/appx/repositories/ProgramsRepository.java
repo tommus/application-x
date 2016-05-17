@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * Created by Tomasz Dzieniak on 13.05.16.
  */
-public interface ProgramRepository extends JpaRepository<Program, Long> {
+public interface ProgramsRepository extends JpaRepository<Program, Long> {
     /**
      * Query method that searches for {@link Program} at given credentials.
      *

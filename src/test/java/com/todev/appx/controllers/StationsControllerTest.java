@@ -1,19 +1,20 @@
 package com.todev.appx.controllers;
 
 import com.google.common.collect.Lists;
+import com.todev.appx.controllers.StationsController.DeleteProgramScheduleBody;
+import com.todev.appx.controllers.StationsController.ProgramScheduleBody;
+import com.todev.appx.controllers.StationsController.UpdateProgramScheduleBody;
 import com.todev.appx.models.Program;
+import com.todev.appx.models.Show;
 import com.todev.appx.models.Station;
-import com.todev.appx.repositories.ProgramRepository;
-import com.todev.appx.repositories.StationRepository;
+import com.todev.appx.repositories.ProgramsRepository;
+import com.todev.appx.repositories.ShowsRepository;
+import com.todev.appx.repositories.StationsRepository;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.mock.http.MockHttpOutputMessage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +24,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,55 +34,72 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by Tomasz Dzieniak on 13.05.16.
  */
 
-public class StationControllerTest extends JsonControllerTest {
+public class StationsControllerTest extends JsonControllerTest {
     private static final int MIN_RANGE = 600;
 
-    private HttpMessageConverter httpMessageConverter;
     private Random random = new Random(System.currentTimeMillis());
+    private List<Show> shows;
     private List<Station> stations;
-    private List<Program> programs;
 
     @Autowired
-    private StationRepository stationRepository;
+    private StationsRepository stationsRepository;
 
     @Autowired
-    private ProgramRepository programRepository;
+    private ShowsRepository showsRepository;
 
     @Autowired
-    void setConverters(HttpMessageConverter<?>[] converters) {
-        httpMessageConverter = Arrays.asList(converters).stream().filter(
-            c -> c instanceof MappingJackson2HttpMessageConverter).findAny().get();
-    }
+    private ProgramsRepository programsRepository;
 
     @Before
     public void setup() throws Exception {
         super.setup();
 
-        stationRepository.deleteAllInBatch();
+        stationsRepository.deleteAllInBatch();
+        showsRepository.deleteAllInBatch();
+        programsRepository.deleteAllInBatch();
 
+        shows = new ArrayList<>();
         stations = new ArrayList<>();
-        programs = new ArrayList<>();
 
         Arrays.asList("TVP1,TVP2,TVP3,Polsat".split(",")).forEach(
             s -> {
-                final Station station = stationRepository.save(new Station(s));
+                final Station station = stationsRepository.save(new Station(s));
                 stations.add(station);
             }
         );
 
         Arrays.asList("One,Two,Three,Four,Five,Six".split(",")).forEach(
-            p -> {
-                final int diff = random.nextInt(MIN_RANGE);
-                for (Station station : stations) {
-                    final Program program = programRepository.save(new Program(station, 60, DateTime.now().plusMinutes(diff), "Brief.", p));
-                    station.addProgram(program);
-                    programs.add(program);
-                }
-                programRepository.flush();
-                stationRepository.flush();
+            s -> {
+                final Show show = showsRepository.save(new Show(s, "Brief.", 60));
+                shows.add(show);
             }
         );
+
+        for (Station station : stations) {
+            for (Show show : shows) {
+                final int diff = random.nextInt(MIN_RANGE);
+                final DateTime time = DateTime.now().plusMinutes(diff);
+                final Program program = programsRepository.save(new Program(station, show, time));
+                station.addProgram(program);
+            }
+        }
     }
+
+    /**
+     * Tests whether a HTTP 415 status code will be returned if wrong content type is provided.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testWrongContentType() throws Exception {
+        mockMvc
+            .perform(
+                get("/stations")
+                    .accept(unsupportedContent)
+                    .contentType(unsupportedContent))
+            .andExpect(status().isUnsupportedMediaType());
+    }
+
 
     /**
      * Tests whether correct number of JSON objects has been retrieved.
@@ -91,10 +109,13 @@ public class StationControllerTest extends JsonControllerTest {
     @Test
     public void testValidListSize() throws Exception {
         mockMvc
-            .perform(get("/stations.json"))
+            .perform(
+                get("/stations")
+                    .accept(jsonContent)
+                    .contentType(jsonContent))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
-            .andExpect(jsonPath("$", hasSize(4)));
+            .andExpect(jsonPath("$", hasSize(stations.size())));
     }
 
     /**
@@ -107,7 +128,10 @@ public class StationControllerTest extends JsonControllerTest {
         final List<String> names = Lists.transform(stations, input -> input.getName());
 
         mockMvc
-            .perform(get("/stations.json"))
+            .perform(
+                get("/stations")
+                    .accept(jsonContent)
+                    .contentType(jsonContent))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
             .andExpect(jsonPath("$..name", is(names)));
@@ -122,7 +146,10 @@ public class StationControllerTest extends JsonControllerTest {
     public void testViewFields() throws Exception {
         for (Station station : stations) {
             mockMvc
-                .perform(get(String.format("/stations/%d.json", station.getId())))
+                .perform(
+                    get(String.format("/stations/%d", station.getId()))
+                        .accept(jsonContent)
+                        .contentType(jsonContent))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(jsonContent))
                 .andExpect(jsonPath("$.id").exists())
@@ -147,7 +174,10 @@ public class StationControllerTest extends JsonControllerTest {
     public void testDetailsCorrect() throws Exception {
         for (Station station : stations) {
             mockMvc
-                .perform(get(String.format("/stations/%d.json", station.getId())))
+                .perform(
+                    get(String.format("/stations/%d", station.getId()))
+                        .accept(jsonContent)
+                        .contentType(jsonContent))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(jsonContent))
                 .andExpect(jsonPath("$.id", is((int) station.getId())))
@@ -157,21 +187,27 @@ public class StationControllerTest extends JsonControllerTest {
     }
 
     /**
-     * Tests whether HTTP 404 NOT FOUND will be returned while trying to delete non-existing program.
+     * Tests whether deletion of not existing program results returning HTTP 404 NOT FOUND.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteNonExisting() throws Exception {
         final Station station = stations.get(0);
+        final DeleteProgramScheduleBody body = new DeleteProgramScheduleBody();
+        body.setCurrentTime(10);
 
         mockMvc
-            .perform(delete(String.format("/stations/%d/schedule/0", station.getId())))
+            .perform(
+                delete(String.format("/stations/%d/schedule", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
             .andExpect(status().isNotFound());
     }
 
     /**
-     * Tests whether removing a {@link Program} from schedule exists.
+     * Tests whether removing a {@link Program} from schedule removes item and returns HTTP 204 NO CONTENT.
      *
      * @throws Exception
      */
@@ -179,13 +215,22 @@ public class StationControllerTest extends JsonControllerTest {
     public void testDeleteExisting() throws Exception {
         final Station station = stations.get(0);
         final Program program = station.getPrograms().iterator().next();
+        final DeleteProgramScheduleBody body = new DeleteProgramScheduleBody();
+        body.setCurrentTime(program.getStartAt().getMillis());
 
         mockMvc
-            .perform(delete(String.format("/stations/%d/schedule/%d", station.getId(), program.getStartAt().getMillis())))
+            .perform(
+                delete(String.format("/stations/%d/schedule", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
             .andExpect(status().isNoContent());
 
         mockMvc
-            .perform(get(String.format("/stations/%d.json", station.getId())))
+            .perform(
+                get(String.format("/stations/%d", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
             .andExpect(jsonPath("$.schedule", hasSize(station.getPrograms().size() - 1)));
@@ -199,21 +244,45 @@ public class StationControllerTest extends JsonControllerTest {
     @Test
     public void testAddItem() throws Exception {
         final Station station = stations.get(0);
+        final Show show = shows.get(0);
         final DateTime date = DateTime.now();
+        final ProgramScheduleBody body = new ProgramScheduleBody();
+        body.setShowId(show.getId());
+        body.setStartAt(date.getMillis());
 
         mockMvc
             .perform(
-                post(String.format("/stations/%d/schedule.json", station.getId()))
-                    .content(serialize(new Program(station, 60, date, "Brief.", "Program")))
-                    .contentType(jsonContent))
+                post(String.format("/stations/%d/schedule", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
             .andExpect(status().isCreated())
             .andExpect(content().contentType(jsonContent))
-            .andExpect(jsonPath("$.name", is("Program")))
-            .andExpect(jsonPath("$.brief", is("Brief.")))
+            .andExpect(jsonPath("$.name", is(show.getName())))
+            .andExpect(jsonPath("$.brief", is(show.getBrief())))
             .andExpect(jsonPath("$.start_time", is(date.getMillis())))
-            .andExpect(jsonPath("$.duration", is(60)))
+            .andExpect(jsonPath("$.duration", is(show.getDuration())))
             .andExpect(jsonPath("$.time_left", is(0)))
             .andExpect(jsonPath("$.time_passed", is(0)));
+    }
+
+    /**
+     * Tests whether ommiting one of required parameters results with returning HTTP 400 BAD REQUEST.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateProgramRequiredParams() throws Exception {
+        final Station station = stations.get(0);
+        final UpdateProgramScheduleBody body = new UpdateProgramScheduleBody();
+
+        mockMvc
+            .perform(
+                patch(String.format("/stations/%d/schedule", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
+            .andExpect(status().isBadRequest());
     }
 
     /**
@@ -224,12 +293,17 @@ public class StationControllerTest extends JsonControllerTest {
     @Test
     public void testUpdateProgramNotExistingProgram() throws Exception {
         final Station station = stations.get(0);
-        final Program program = station.getPrograms().iterator().next();
+        final DateTime date = DateTime.now();
+        final UpdateProgramScheduleBody body = new UpdateProgramScheduleBody();
+        body.setCurrentTime(10);
+        body.setNewTime(date.getMillis());
 
         mockMvc
-            .perform(put(String.format("/stations/%d/schedule/0.json", station.getId()))
-                .content(serialize(program))
-                .contentType(jsonContent))
+            .perform(
+                patch(String.format("/stations/%d/schedule", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
             .andExpect(status().isNotFound());
     }
 
@@ -240,13 +314,14 @@ public class StationControllerTest extends JsonControllerTest {
      */
     @Test
     public void testUpdateProgramNotExistingStation() throws Exception {
-        final Station station = stations.get(0);
-        final Program program = station.getPrograms().iterator().next();
+        final UpdateProgramScheduleBody body = new UpdateProgramScheduleBody();
 
         mockMvc
-            .perform(put(String.format("/stations/-1/schedule/%d.json", program.getStartAt().getMillis()))
-                .content(serialize(program))
-                .contentType(jsonContent))
+            .perform(
+                patch(String.format("/stations/%d/schedule", -1))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
             .andExpect(status().isNotFound());
     }
 
@@ -259,35 +334,25 @@ public class StationControllerTest extends JsonControllerTest {
     public void testUpdateItem() throws Exception {
         final Station station = stations.get(0);
         final Program program = station.getPrograms().iterator().next();
-        final long time = program.getStartAt().getMillis();
-        final int duration = program.getDuration() + 20;
+        final DateTime time = program.getStartAt();
+        final DateTime newTime = time.plusMinutes(30);
+        final UpdateProgramScheduleBody body = new UpdateProgramScheduleBody();
+        body.setCurrentTime(time.getMillis());
+        body.setNewTime(newTime.getMillis());
 
         mockMvc
             .perform(
-                put(String.format("/stations/%d/schedule/%d.json", station.getId(), time))
-                    .content(serialize(new Program(
-                        station, duration, program.getStartAt(), program.getBrief(), program.getName())))
-                    .contentType(jsonContent))
+                patch(String.format("/stations/%d/schedule", station.getId()))
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .content(serialize(body)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
             .andExpect(jsonPath("$.name", is(program.getName())))
             .andExpect(jsonPath("$.brief", is(program.getBrief())))
-            .andExpect(jsonPath("$.start_time", is(program.getStartAt().getMillis())))
-            .andExpect(jsonPath("$.duration", is(duration)))
+            .andExpect(jsonPath("$.start_time", is(newTime.getMillis())))
+            .andExpect(jsonPath("$.duration", is(program.getDuration())))
             .andExpect(jsonPath("$.time_left", is(0)))
             .andExpect(jsonPath("$.time_passed", is(0)));
-    }
-
-    /**
-     * Serializes given object as JSON-formatted string.
-     *
-     * @param o an object that should be serialized.
-     * @return serialized JSON string.
-     * @throws IOException an error that will be raised while trying to serialize malformed object.
-     */
-    private String serialize(Object o) throws IOException {
-        MockHttpOutputMessage mockMessage = new MockHttpOutputMessage();
-        httpMessageConverter.write(o, jsonContent, mockMessage);
-        return mockMessage.getBodyAsString();
     }
 }

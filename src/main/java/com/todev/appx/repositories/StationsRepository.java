@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * Created by Tomasz Dzieniak on 13.05.16.
  */
-public interface StationRepository extends JpaRepository<Station, Long> {
+public interface StationsRepository extends JpaRepository<Station, Long> {
     // Use default CRUD methods.
 }

@@ -1,7 +1,9 @@
 package com.todev.appx.controllers;
 
 import com.todev.appx.models.Program;
-import com.todev.appx.repositories.ProgramRepository;
+import com.todev.appx.models.Show;
+import com.todev.appx.repositories.ProgramsRepository;
+import com.todev.appx.repositories.ShowsRepository;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -18,21 +20,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by Tomasz Dzieniak on 13.05.16.
  */
-public class ProgramControllerTest extends JsonControllerTest {
+public class ProgramsControllerTest extends JsonControllerTest {
     private static final int HRS_BUFFER = 5;
 
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime evening = DateTime.now().plusHours(HRS_BUFFER);
 
+    private Show show;
+
     @Autowired
-    private ProgramRepository programRepository;
+    private ProgramsRepository programsRepository;
+
+    @Autowired
+    private ShowsRepository showsRepository;
 
     @Before
     public void setup() throws Exception {
         super.setup();
 
-        programRepository.deleteAllInBatch();
-        programRepository.save(new Program(null, 60, evening, "Brief description.", "Program name"));
+        show = showsRepository.save(new Show("Malcolm in the Middle", "Meet the Malcolm's tough life.", 60));
+
+        programsRepository.deleteAllInBatch();
+        programsRepository.save(new Program(null, show, evening));
+    }
+
+    /**
+     * Tests whether a HTTP 415 status code will be returned if wrong content type is provided.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testWrongContentType() throws Exception {
+        final DateTime test = evening.minusMinutes(5);
+
+        mockMvc
+            .perform(
+                get("/programs")
+                    .accept(unsupportedContent)
+                    .contentType(unsupportedContent)
+                    .param("time", String.valueOf(test.getMillis())))
+            .andExpect(status().isUnsupportedMediaType());
     }
 
     /**
@@ -45,7 +72,11 @@ public class ProgramControllerTest extends JsonControllerTest {
         final DateTime test = evening.minusMinutes(5);
 
         mockMvc
-            .perform(get("/programs.json").param("time", String.valueOf(test.getMillis())))
+            .perform(
+                get("/programs")
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .param("time", String.valueOf(test.getMillis())))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
             .andExpect(jsonPath("$", hasSize(0)));
@@ -61,7 +92,11 @@ public class ProgramControllerTest extends JsonControllerTest {
         final DateTime test = evening.plusMinutes(5);
 
         mockMvc
-            .perform(get("/programs.json").param("time", String.valueOf(test.getMillis())))
+            .perform(
+                get("/programs")
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .param("time", String.valueOf(test.getMillis())))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
             .andExpect(jsonPath("$", hasSize(1)));
@@ -77,7 +112,11 @@ public class ProgramControllerTest extends JsonControllerTest {
         final DateTime test = evening.plusMinutes(5);
 
         mockMvc
-            .perform(get("/programs.json").param("time", String.valueOf(test.getMillis())))
+            .perform(
+                get("/programs")
+                    .accept(jsonContent)
+                    .contentType(jsonContent)
+                    .param("time", String.valueOf(test.getMillis())))
             .andExpect(status().isOk())
             .andExpect(content().contentType(jsonContent))
             .andExpect(jsonPath("$", hasSize(1)))
@@ -101,7 +140,11 @@ public class ProgramControllerTest extends JsonControllerTest {
             final DateTime test = evening.plusMinutes(i);
 
             mockMvc
-                .perform(get("/programs.json").param("time", String.valueOf(test.getMillis())))
+                .perform(
+                    get("/programs")
+                        .accept(jsonContent)
+                        .contentType(jsonContent)
+                        .param("time", String.valueOf(test.getMillis())))
                 .andExpect(jsonPath("$[0].time_passed", is(i)));
         }
     }
@@ -117,7 +160,11 @@ public class ProgramControllerTest extends JsonControllerTest {
             final DateTime test = evening.plusMinutes(i);
 
             mockMvc
-                .perform(get("/programs.json").param("time", String.valueOf(test.getMillis())))
+                .perform(
+                    get("/programs")
+                        .accept(jsonContent)
+                        .contentType(jsonContent)
+                        .param("time", String.valueOf(test.getMillis())))
                 .andExpect(jsonPath("$[0].time_left", is(60 - i)));
         }
     }
@@ -131,7 +178,10 @@ public class ProgramControllerTest extends JsonControllerTest {
     @Test
     public void testMissingTimeParam() throws Exception {
         mockMvc
-            .perform(get("/programs.json"))
-            .andExpect(status().is4xxClientError());
+            .perform(
+                get("/programs")
+                    .accept(jsonContent)
+                    .contentType(jsonContent))
+            .andExpect(status().isBadRequest());
     }
 }

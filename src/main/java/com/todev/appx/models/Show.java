@@ -1,6 +1,6 @@
 package com.todev.appx.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -16,39 +16,37 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Tomasz Dzieniak on 13.05.16.
+ * Created by Tomasz Dzieniak on 14.05.16.
  */
 @Entity
-public class Station {
+public class Show {
     @GeneratedValue
     @Id
     @JsonView(View.Basic.class)
     private long id;
 
-    @JsonView(View.Basic.class)
     private String name;
+    private String brief;
+    private int duration;
 
-    @JsonProperty(value = "schedule")
-    @JsonView(View.Details.class)
+    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToMany(mappedBy = "station", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "show", cascade = CascadeType.REMOVE)
     private Set<Program> programs = new HashSet<>();
 
-    public Station() {
+    public Show() {
         // Default constructor for Hibernate.
     }
 
-    public Station(String name) {
+    public Show(String name, String brief, int duration) {
         this.name = name;
+        this.brief = brief;
+        this.duration = duration;
     }
 
     public long getId() {
         return id;
     }
-
-//    public void setId(long id) {
-//        this.id = id;
-//    }
 
     public String getName() {
         return name;
@@ -56,6 +54,22 @@ public class Station {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBrief() {
+        return brief;
+    }
+
+    public void setBrief(String brief) {
+        this.brief = brief;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public Set<Program> getPrograms() {
@@ -67,14 +81,16 @@ public class Station {
     }
 
     public void addProgram(Program program) {
-        programs.add(program);
+        this.programs.add(program);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(
             getId(),
-            getName()
+            getName(),
+            getBrief(),
+            getDuration()
         );
     }
 
@@ -88,21 +104,25 @@ public class Station {
             return true;
         }
 
-        if (!(obj instanceof Station)) {
+        if (!(obj instanceof Show)) {
             return false;
         }
 
-        final Station other = (Station) obj;
+        final Show other = (Show) obj;
 
         return Objects.equal(getId(), other.getId())
-            && Objects.equal(getName(), other.getName());
+            && Objects.equal(getName(), other.getName())
+            && Objects.equal(getBrief(), other.getBrief())
+            && Objects.equal(getDuration(), other.getDuration());
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(Station.class)
+        return MoreObjects.toStringHelper(Program.class)
             .add("id", getId())
             .add("name", getName())
+            .add("brief", getBrief())
+            .add("duration", getDuration())
             .toString();
     }
 
@@ -111,9 +131,6 @@ public class Station {
      */
     public static class View {
         public static class Basic {
-        }
-
-        public static class Details extends Basic {
         }
     }
 }

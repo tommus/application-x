@@ -3,7 +3,6 @@ package com.todev.appx.serializers;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -12,8 +11,6 @@ import java.io.IOException;
  * Created by Tomasz Dzieniak on 13.05.16.
  */
 public class DateTimeDeserializer extends JsonDeserializer<DateTime> {
-    private static final Logger LOGGER = Logger.getLogger(DateTimeDeserializer.class);
-
     /**
      * Deserializes POSIX timestamp to {@link DateTime} type.
      *

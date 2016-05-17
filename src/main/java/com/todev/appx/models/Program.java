@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.joda.ser.DateTimeSerializer;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.todev.appx.serializers.DateTimeDeserializer;
-import com.todev.appx.views.Views;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -30,33 +29,28 @@ public class Program {
     @JsonIgnore
     private long id;
 
-    @JsonView({Views.BasicProgram.class, Views.DetailStation.class})
-    private String name;
-
-    @JsonView({Views.BasicProgram.class, Views.DetailStation.class})
-    private String brief;
-
     @JsonDeserialize(using = DateTimeDeserializer.class)
     @JsonProperty(value = "start_time")
     @JsonSerialize(using = DateTimeSerializer.class)
-    @JsonView({Views.ScheduleProgram.class, Views.DetailStation.class})
+    @JsonView({View.Schedule.class, Station.View.Details.class})
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime startAt;
-
-    @JsonView(Views.Invisible.class)
-    private int duration;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.DETACH)
     private Station station;
 
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.DETACH)
+    private Show show;
+
     @JsonProperty(value = "time_passed")
-    @JsonView(Views.DetailProgram.class)
+    @JsonView(View.Details.class)
     @Transient
     private long sinceStart;
 
     @JsonProperty(value = "time_left")
-    @JsonView(Views.DetailProgram.class)
+    @JsonView(View.Details.class)
     @Transient
     private long tillEnd;
 
@@ -64,36 +58,24 @@ public class Program {
         // Default constructor for Hibernate.
     }
 
-    public Program(Station station, int duration, DateTime startAt, String brief, String name) {
+    public Program(Station station, Show show, DateTime startAt) {
         this.station = station;
-        this.duration = duration;
+        this.show = show;
         this.startAt = startAt;
-        this.brief = brief;
-        this.name = name;
     }
 
     public long getId() {
         return id;
     }
 
-//    public void setId(long id) {
-//        this.id = id;
-//    }
-
+    @JsonView({View.Basic.class, Station.View.Details.class})
     public String getName() {
-        return name;
+        return show.getName();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    @JsonView({View.Basic.class, Station.View.Details.class})
     public String getBrief() {
-        return brief;
-    }
-
-    public void setBrief(String brief) {
-        this.brief = brief;
+        return show.getBrief();
     }
 
     public DateTime getStartAt() {
@@ -104,12 +86,9 @@ public class Program {
         this.startAt = startAt;
     }
 
+    @JsonView(View.Invisible.class)
     public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
+        return show.getDuration();
     }
 
     public Station getStation() {
@@ -118,6 +97,14 @@ public class Program {
 
     public void setStation(Station station) {
         this.station = station;
+    }
+
+    public Show getShow() {
+        return show;
+    }
+
+    public void setShow(Show show) {
+        this.show = show;
     }
 
     public long getSinceStart() {
@@ -140,10 +127,9 @@ public class Program {
     public int hashCode() {
         return Objects.hashCode(
             getId(),
-            getName(),
-            getBrief(),
             getStartAt(),
-            getDuration(),
+            getStation(),
+            getShow(),
             getSinceStart(),
             getTillEnd()
         );
@@ -166,11 +152,9 @@ public class Program {
         final Program other = (Program) obj;
 
         return Objects.equal(getId(), other.getId())
-            && Objects.equal(getName(), other.getName())
-            && Objects.equal(getBrief(), other.getBrief())
             && Objects.equal(getStartAt(), other.getStartAt())
-            && Objects.equal(getDuration(), other.getDuration())
             && Objects.equal(getStation(), other.getStation())
+            && Objects.equal(getShow(), other.getShow())
             && Objects.equal(getSinceStart(), other.getSinceStart())
             && Objects.equal(getTillEnd(), other.getTillEnd());
     }
@@ -179,13 +163,28 @@ public class Program {
     public String toString() {
         return MoreObjects.toStringHelper(Program.class)
             .add("id", getId())
-            .add("name", getName())
-            .add("brief", getBrief())
             .add("start_at", getStartAt().toString())
-            .add("duration", getDuration())
-            .add("station", getStation().getName())
+            .add("station", getStation())
+            .add("show", getShow())
             .add("time_passed", getSinceStart())
             .add("time_left", getTillEnd())
             .toString();
+    }
+
+    /**
+     * Class allow to define which fields will be present in queried response.
+     */
+    public static class View {
+        public static class Invisible {
+        }
+
+        public static class Basic {
+        }
+
+        public static class Details extends Basic {
+        }
+
+        public static class Schedule extends Basic {
+        }
     }
 }

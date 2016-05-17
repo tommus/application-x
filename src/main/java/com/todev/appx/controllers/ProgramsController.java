@@ -2,13 +2,13 @@ package com.todev.appx.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.todev.appx.models.Program;
-import com.todev.appx.repositories.ProgramRepository;
-import com.todev.appx.views.Views;
+import com.todev.appx.repositories.ProgramsRepository;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,36 +20,38 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("programs")
-public class ProgramController {
-    private final ProgramRepository programRepository;
+public class ProgramsController {
+    private final ProgramsRepository programsRepository;
 
     /**
-     * Create a new ProgramController.
+     * Create a new {@link ProgramsController}.
      *
-     * @param programRepository a related {@link ProgramRepository} repository.
+     * @param programsRepository a related {@link ProgramsRepository} repository.
      */
     @Autowired
-    public ProgramController(ProgramRepository programRepository) {
-        this.programRepository = programRepository;
+    public ProgramsController(ProgramsRepository programsRepository) {
+        this.programsRepository = programsRepository;
     }
 
     /**
-     * Handler method for a /programs endpoint.
+     * Retrieves {@link Program}s ongoing at given time.
      *
-     * @param time a point in time ({@link DateTime}) that should be used to retrieve ongoing programs.
-     * @return a collection of ongoing programs (related to given time).
+     * @param time a point in time that should be used to retrieve ongoing programs.
+     * @return a collection of ongoing {@link Program}s.
      */
-    @JsonView(Views.DetailProgram.class)
-    @RequestMapping(value = "", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public List<Program> getPrograms(
+    @JsonView(Program.View.Details.class)
+    @RequestMapping(value = "", method = RequestMethod.GET,
+        produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<Program> readPrograms(
         @RequestParam(value = "time") long time) {
-        final List<Program> programs = programRepository.findAll();
+        final List<Program> programs = programsRepository.findAll();
         filterOngoing(programs, new DateTime(time));
         return programs;
     }
 
     /**
-     * Filters a collection of programs. Leaves only these are ongoing at given time.
+     * Filters a collection of {@link Program}s. Leaves only those are ongoing at given time.
      *
      * @param programs a collection of programs that should be filtered.
      * @param time     a point in time that should be used to filter programs.
