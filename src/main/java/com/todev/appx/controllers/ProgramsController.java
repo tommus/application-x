@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -45,34 +44,24 @@ public class ProgramsController {
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<Program> readPrograms(
         @RequestParam(value = "time") long time) {
-        final List<Program> programs = programsRepository.findAll();
-        filterOngoing(programs, new DateTime(time));
+
+        final DateTime select = new DateTime(time);
+        final List<Program> programs = programsRepository.findByOngoing(select);
+        updateTimes(programs, select);
         return programs;
     }
 
-    /**
-     * Filters a collection of {@link Program}s. Leaves only those are ongoing at given time.
-     *
-     * @param programs a collection of programs that should be filtered.
-     * @param time     a point in time that should be used to filter programs.
-     */
-    private void filterOngoing(List<Program> programs, DateTime time) {
-        final Iterator<Program> iterator = programs.iterator();
-
-        while (iterator.hasNext()) {
-            final Program program = iterator.next();
-            final int duration = program.getDuration();
-            final DateTime startsAt = program.getStartAt();
-            final DateTime endsAt = startsAt.plusMinutes(duration);
-
-            if (time.getMillis() < startsAt.getMillis() || time.getMillis() >= endsAt.getMillis()) {
-                iterator.remove();
-            } else {
-                final long sinceStart = Minutes.minutesBetween(startsAt, time).getMinutes();
-                final long tillEnd = Minutes.minutesBetween(time, endsAt).getMinutes();
-                program.setSinceStart(sinceStart);
-                program.setTillEnd(tillEnd);
+    private void updateTimes(List<Program> ongoing, DateTime time) {
+        ongoing.forEach(
+            p -> {
+                final int duration = p.getDuration();
+                final DateTime startAt = p.getStartAt();
+                final DateTime endAt = p.getStartAt().plusMinutes(duration);
+                final long sinceStart = Minutes.minutesBetween(startAt, time).getMinutes();
+                final long tillEnd = Minutes.minutesBetween(time, endAt).getMinutes();
+                p.setSinceStart(sinceStart);
+                p.setTillEnd(tillEnd);
             }
-        }
+        );
     }
 }

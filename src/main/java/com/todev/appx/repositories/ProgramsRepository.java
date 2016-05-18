@@ -4,11 +4,16 @@ import com.todev.appx.models.Program;
 import com.todev.appx.models.Station;
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 /**
  * Created by Tomasz Dzieniak on 13.05.16.
  */
 public interface ProgramsRepository extends JpaRepository<Program, Long> {
+    String FILTER_ONGOING = "SELECT p FROM Program p WHERE ?1 BETWEEN p.startAt AND DATEADD(minute, p.show.duration, p.startAt)";
+
     /**
      * Query method that searches for {@link Program} at given credentials.
      *
@@ -17,4 +22,13 @@ public interface ProgramsRepository extends JpaRepository<Program, Long> {
      * @return founded {@link Program}.
      */
     Program findFirstByStationIdAndStartAt(long stationId, DateTime startAt);
+
+    /**
+     * Query method that searches for ongoing {@link Program}s related to given {@literal time}.
+     *
+     * @param time a point in time related to which ongoing programs should be retrieved.
+     * @return a collection of ongoing {@link Program}s.
+     */
+    @Query(FILTER_ONGOING)
+    List<Program> findByOngoing(DateTime time);
 }
