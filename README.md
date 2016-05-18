@@ -81,9 +81,9 @@ For pritty-printing `curl`'s responses (depends on your needs) you can install:
 
 And pipe commands (depends on format):
 
-> curl "http://localhost:8080/stations.json" | python -mjson.tool | pygmentize -l json
+> curl -H "Accept: application/json" "http://localhost:8080/stations" | python -mjson.tool | pygmentize -l json
 
-> curl "http://localhost:8080/stations.xml" | xmllint --format - | pygmentize -l xml
+> curl -H "Accept: application/xml" "http://localhost:8080/stations" | xmllint --format - | pygmentize -l xml
 
 Next steps
 ----------
