@@ -51,6 +51,12 @@ public class ProgramsController {
         return programs;
     }
 
+    /**
+     * Refreshes {@literal sinceStart} and {@literal tillEnd} fields for all {@link Program}s in given collection.
+     *
+     * @param ongoing a collection of {@link Program}s which fields will be updated.
+     * @param time a point in time related to which fields should be recalculated.
+     */
     private void updateTimes(List<Program> ongoing, DateTime time) {
         ongoing.forEach(
             p -> {
