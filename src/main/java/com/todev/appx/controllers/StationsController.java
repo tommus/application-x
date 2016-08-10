@@ -8,6 +8,8 @@ import com.todev.appx.models.Station;
 import com.todev.appx.repositories.ProgramsRepository;
 import com.todev.appx.repositories.ShowsRepository;
 import com.todev.appx.repositories.StationsRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = { "stations" }, description = "Operations related to stations")
 @RestController
 @RequestMapping("stations")
 public class StationsController {
@@ -64,10 +67,11 @@ public class StationsController {
    *
    * @return a collection of {@link Station} items.
    */
+  @ApiOperation(value = "Retrieves all stations")
   @JsonView(Station.View.Basic.class)
   @RequestMapping(value = "", method = RequestMethod.GET, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public List<Station> readStations() {
     return stationsRepository.findAll();
   }
@@ -78,10 +82,11 @@ public class StationsController {
    * @param id an ID of {@link Station} item that will be retrieved.
    * @return information about retrieval process with corresponding item's details.
    */
+  @ApiOperation(value = "Finds station by ID")
   @JsonView(Station.View.Details.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public Station getStation(@PathVariable long id) {
     validateStation(id);
 
@@ -100,9 +105,10 @@ public class StationsController {
    * @param body details about scheduled {@link Program}.
    * @return information about scheduling process with corresponding item's details.
    */
+  @ApiOperation(value = "Schedules program")
   @RequestMapping(value = "{id}/schedule", method = RequestMethod.POST, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public ResponseEntity<?> scheduleProgram(@PathVariable long id, @RequestBody ProgramScheduleBody body) {
     validateStation(id);
 
@@ -126,9 +132,10 @@ public class StationsController {
    * @param body details about re-scheduled {@link Program}.
    * @return information about re-scheduling process with corresponding item's details.
    */
+  @ApiOperation(value = "Reschedules program")
   @RequestMapping(value = "{id}/schedule", method = RequestMethod.PATCH, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public ResponseEntity<?> rescheduleProgram(@PathVariable long id, @RequestBody UpdateProgramScheduleBody body) {
     validateStation(id);
 
@@ -170,9 +177,10 @@ public class StationsController {
    * @param body details about unscheduled {@link Program}.
    * @return information about unscheduling process.
    */
+  @ApiOperation(value = "Unschedules program")
   @RequestMapping(value = "{id}/schedule", method = RequestMethod.DELETE, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public ResponseEntity<?> unscheduleProgram(@PathVariable long id, @RequestBody DeleteProgramScheduleBody body) {
     validateStation(id);
 

@@ -25,7 +25,6 @@ Response codes:
 | Code                              | Description                                                                |
 |:----------------------------------|:---------------------------------------------------------------------------|
 | HTTP 200 (OK)                     | When add operation ends successfully.                                      |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 
@@ -57,7 +56,6 @@ Response codes:
 | Code                              | Description                                                                |
 |:----------------------------------|:---------------------------------------------------------------------------|
 | HTTP 200 (OK)                     | When add operation ends successfully.                                      |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 
@@ -108,7 +106,6 @@ Response codes:
 |:----------------------------------|:---------------------------------------------------------------------------|
 | HTTP 200 (OK)                     | When add operation ends successfully.                                      |
 | HTTP 404 (NOT FOUND)              | If show at given <i>id</i> not exist.                                      |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 
@@ -158,7 +155,6 @@ Response codes:
 | HTTP 200 (OK)                     | When update operation ends successfully.                                   |
 | HTTP 400 (BAD REQUEST)            | If none of optional parameters will be provided.                           |
 | HTTP 404 (NOT FOUND)              | If show at given <i>id</i> not exist.                                      |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 

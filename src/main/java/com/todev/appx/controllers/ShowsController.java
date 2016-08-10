@@ -2,6 +2,8 @@ package com.todev.appx.controllers;
 
 import com.todev.appx.models.Show;
 import com.todev.appx.repositories.ShowsRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = { "shows" }, description = "Operations related to shows")
 @RestController
 @RequestMapping("shows")
 public class ShowsController {
@@ -26,6 +29,7 @@ public class ShowsController {
    * @param body contains item's specification.
    * @return detailed information about creation process with corresponding item's details.
    */
+  @ApiOperation(value = "Creates a new show")
   @RequestMapping(value = "", method = RequestMethod.POST, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
   }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
@@ -39,9 +43,10 @@ public class ShowsController {
    *
    * @return a collection of {@link Show} items.
    */
+  @ApiOperation(value = "Retrieves all shows")
   @RequestMapping(value = "", method = RequestMethod.GET, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public List<Show> readShows() {
     return showsRepository.findAll();
   }
@@ -52,9 +57,10 @@ public class ShowsController {
    * @param id an ID of {@link Show} item that will be retrieved.
    * @return information about retrieval process with corresponding item's details.
    */
+  @ApiOperation(value = "Finds show by ID")
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public ResponseEntity<?> readShow(@PathVariable long id) {
     final Show show = showsRepository.findOne(id);
 
@@ -72,9 +78,10 @@ public class ShowsController {
    * @param body contains item's specification.
    * @return detailed information about update process with corresponding item's details.
    */
+  @ApiOperation(value = "Updates an existing show")
   @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public ResponseEntity<?> updateShow(@PathVariable long id, @RequestBody Show body) {
     final Show show = showsRepository.findOne(id);
 
@@ -107,9 +114,10 @@ public class ShowsController {
    * @param id an ID of {@link Show} item that will be deleted.
    * @return detailed information about delete process.
    */
+  @ApiOperation(value = "Deletes a show")
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = {
       MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public ResponseEntity<?> deleteShow(@PathVariable long id) {
     final Show show = showsRepository.findOne(id);
 

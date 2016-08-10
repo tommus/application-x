@@ -3,6 +3,8 @@ package com.todev.appx.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.todev.appx.models.Program;
 import com.todev.appx.repositories.ProgramsRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = { "programs" }, description = "Operations related to programs")
 @RestController
 @RequestMapping("programs")
 public class ProgramsController {
@@ -26,10 +29,11 @@ public class ProgramsController {
    * @param time a point in time that should be used to retrieve ongoing programs.
    * @return a collection of ongoing {@link Program}s.
    */
+  @ApiOperation(value = "Finds ongoing programs")
   @JsonView(Program.View.Details.class)
   @RequestMapping(value = "", method = RequestMethod.GET, produces = {
       MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE
-  }, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+  })
   public List<Program> readPrograms(@RequestParam(value = "time") long time) {
 
     final DateTime select = new DateTime(time);

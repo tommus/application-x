@@ -32,7 +32,6 @@ Response codes:
 | HTTP 201 (CREATED)                | When schedule operation ends successfully.                                 |
 | HTTP 400 (BAD REQUEST)            | If any of required parameters will be absent in request body.              |
 | HTTP 404 (NOT FOUND)              | When station at given ID not exist.                                        |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 
@@ -85,7 +84,6 @@ Response codes:
 | HTTP 200 (OK)                     | When reschedule operation ends successfully.                             |
 | HTTP 400 (BAD REQUEST)            | If any of required parameters will be absent in request body.<br> When program at given <i>current_time</i> is not scheduled in station at given <i>id</i>. |
 | HTTP 404 (NOT FOUND)              | When station at given ID not exist.                                        |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 
@@ -134,7 +132,6 @@ Response codes:
 | HTTP 204 (NO CONTENT)             | When unschedule operation ends successfully.                               |
 | HTTP 400 (BAD REQUEST)            | When program at given <i>current_time</i> is not scheduled in station at given <i>id</i>. |
 | HTTP 404 (NOT FOUND)              | When station at given ID or program at given credentials not exists.       |
-| HTTP 415 (UNSUPPORTED MEDIA TYPE) | If other content type than mentioned at the top of this file will be used. |
 
 Sample request:
 
