@@ -1,5 +1,7 @@
 package com.todev.appx;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.todev.appx.models.Program;
 import com.todev.appx.models.Show;
 import com.todev.appx.models.Station;
@@ -13,7 +15,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+@EnableSwagger2
 @SpringBootApplication
 public class Application {
   private static final Logger LOG = Logger.getLogger(Application.class);
@@ -90,5 +100,45 @@ public class Application {
 
       LOG.info("Programs has been added.");
     };
+  }
+
+  /**
+   * This method configures Swagger REST documentation plugin.
+   *
+   * @return Swagger configuration.
+   */
+  @Bean
+  Docket docs() {
+    return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().paths(apiPaths()).build();
+  }
+
+  private ApiInfo apiInfo() {
+    return new ApiInfoBuilder().title("Application-X REST API")
+        .description("Simple TV shows/stations REST service written in Java (Spring + Hibernate).")
+        .contact(apiContact())
+        .termsOfServiceUrl("https://www.gnu.org/licenses/gpl-3.0.html")
+        .license("GNU GPL, Version 3")
+        .licenseUrl("https://www.gnu.org/licenses/gpl-3.0.html")
+        .version("0.1.1")
+        .build();
+  }
+
+  /**
+   * This method allows to configure endpoints that will be documented.
+   *
+   * @return a {@link Predicate} predicate that defines a list of documented endpoints.
+   */
+  private Predicate<String> apiPaths() {
+    // Exclude Basic Error Controller.
+    return Predicates.not(PathSelectors.regex("/error.*"));
+  }
+
+  /**
+   * This method allows to configure contact information.
+   *
+   * @return a developer {@link Contact} contact information.
+   */
+  private Contact apiContact() {
+    return new Contact("Tomasz Dzieniak", "https://github.com/tommus/tv-shows-rest-api", "tomasz.dzieniak@to-dev.com");
   }
 }
