@@ -2,10 +2,6 @@ package com.todev.appx.controllers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
 import com.todev.appx.models.Program;
 import com.todev.appx.models.Show;
 import com.todev.appx.models.Station;
@@ -13,7 +9,10 @@ import com.todev.appx.repositories.ProgramsRepository;
 import com.todev.appx.repositories.ShowsRepository;
 import com.todev.appx.repositories.StationsRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -52,7 +51,7 @@ public class StationsController {
     private final Interval range = new Interval(start, end);
 
     @Override
-    public boolean apply(Program input) {
+    public boolean test(Program input) {
       final int duration = input.getDuration();
       final DateTime programStart = input.getStartAt();
       final DateTime programEnd = input.getStartAt().plusMinutes(duration);
@@ -89,7 +88,7 @@ public class StationsController {
     final Station station = stationsRepository.findOne(id);
     final Set<Program> programs = station.getPrograms();
 
-    station.setPrograms(Sets.filter(programs, filterCurrent));
+    station.setPrograms(programs.stream().filter(filterCurrent).collect(Collectors.toSet()));
 
     return station;
   }
@@ -253,34 +252,28 @@ public class StationsController {
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(getShowId(), getStartAt());
+      return Objects.hash(getShowId(), getStartAt());
     }
 
     @Override
     public boolean equals(Object obj) {
-      if (obj == null) {
-        return false;
-      }
-
       if (obj == this) {
         return true;
       }
 
-      if (!(obj instanceof ProgramScheduleBody)) {
-        return false;
+      if (obj instanceof ProgramScheduleBody) {
+        final ProgramScheduleBody other = (ProgramScheduleBody) obj;
+
+        return Objects.equals(getShowId(), other.getShowId()) && Objects.equals(getStartAt(), other.getStartAt());
       }
 
-      final ProgramScheduleBody other = (ProgramScheduleBody) obj;
-
-      return Objects.equal(getShowId(), other.getShowId()) && Objects.equal(getStartAt(), other.getStartAt());
+      return false;
     }
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(ProgramScheduleBody.class)
-          .add("show_id", getShowId())
-          .add("start_at", getStartAt())
-          .toString();
+      return "ProgramScheduleBody {show_id = " + Objects.toString(getShowId()) + ", start_at = " + Objects.toString(
+          getStartAt()) + "}";
     }
   }
 
@@ -332,37 +325,34 @@ public class StationsController {
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(getCurrentTime(), getShowId(), getNewTime());
+      return Objects.hash(getCurrentTime(), getShowId(), getNewTime());
     }
 
     @Override
     public boolean equals(Object obj) {
-      if (obj == null) {
-        return false;
-      }
-
       if (obj == this) {
         return true;
       }
 
-      if (!(obj instanceof UpdateProgramScheduleBody)) {
-        return false;
+      if (obj instanceof UpdateProgramScheduleBody) {
+        final UpdateProgramScheduleBody other = (UpdateProgramScheduleBody) obj;
+
+        return Objects.equals(getCurrentTime(), other.getCurrentTime()) && Objects.equals(getShowId(),
+            other.getShowId()) && Objects.equals(getNewTime(), other.getNewTime());
       }
 
-      final UpdateProgramScheduleBody other = (UpdateProgramScheduleBody) obj;
-
-      return Objects.equal(getCurrentTime(), other.getCurrentTime())
-          && Objects.equal(getShowId(), other.getShowId())
-          && Objects.equal(getNewTime(), other.getNewTime());
+      return false;
     }
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(UpdateProgramScheduleBody.class)
-          .add("current_time", getCurrentTime())
-          .add("show_id", getShowId())
-          .add("new_time", getNewTime())
-          .toString();
+      return "UpdateProgramScheduleBody {current_time = "
+          + Objects.toString(getCurrentTime())
+          + ", show_id = "
+          + Objects.toString(getShowId())
+          + ", new_time = "
+          + getNewTime()
+          + "}";
     }
   }
 
@@ -392,33 +382,27 @@ public class StationsController {
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(getCurrentTime());
+      return Objects.hash(getCurrentTime());
     }
 
     @Override
     public boolean equals(Object obj) {
-      if (obj == null) {
-        return false;
-      }
-
       if (obj == this) {
         return true;
       }
 
-      if (!(obj instanceof DeleteProgramScheduleBody)) {
-        return false;
+      if (obj instanceof DeleteProgramScheduleBody) {
+        final DeleteProgramScheduleBody other = (DeleteProgramScheduleBody) obj;
+
+        return Objects.equals(getCurrentTime(), other.getCurrentTime());
       }
 
-      final DeleteProgramScheduleBody other = (DeleteProgramScheduleBody) obj;
-
-      return Objects.equal(getCurrentTime(), other.getCurrentTime());
+      return false;
     }
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(DeleteProgramScheduleBody.class)
-          .add("current_time", getCurrentTime())
-          .toString();
+      return "DeleteProgramScheduleBody {current_time = " + Objects.toString(getCurrentTime()) + "}";
     }
   }
 }

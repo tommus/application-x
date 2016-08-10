@@ -6,9 +6,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.joda.ser.DateTimeSerializer;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.todev.appx.serializers.DateTimeDeserializer;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -121,40 +120,44 @@ public class Program {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getId(), getStartAt(), getStation(), getShow(), getSinceStart(), getTillEnd());
+    return Objects.hash(getId(), getStartAt(), getStation(), getShow(), getSinceStart(), getTillEnd());
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-
     if (obj == this) {
       return true;
     }
 
-    if (!(obj instanceof Program)) {
-      return false;
+    if (obj instanceof Program) {
+      final Program other = (Program) obj;
+
+      return Objects.equals(getId(), other.getId())
+          && Objects.equals(getStartAt(), other.getStartAt())
+          && Objects.equals(getStation(), other.getStation())
+          && Objects.equals(getShow(), other.getShow())
+          && Objects.equals(getSinceStart(), other.getSinceStart())
+          && Objects.equals(getTillEnd(), other.getTillEnd());
     }
 
-    final Program other = (Program) obj;
-
-    return Objects.equal(getId(), other.getId()) && Objects.equal(getStartAt(), other.getStartAt()) && Objects.equal(
-        getStation(), other.getStation()) && Objects.equal(getShow(), other.getShow()) && Objects.equal(getSinceStart(),
-        other.getSinceStart()) && Objects.equal(getTillEnd(), other.getTillEnd());
+    return false;
   }
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(Program.class)
-        .add("id", getId())
-        .add("start_at", getStartAt().toString())
-        .add("station", getStation())
-        .add("show", getShow())
-        .add("time_passed", getSinceStart())
-        .add("time_left", getTillEnd())
-        .toString();
+    return "Program {id = "
+        + Objects.toString(getId())
+        + ", start_at = "
+        + Objects.toString(getStartAt().toString())
+        + ", station = "
+        + Objects.toString(getStation())
+        + ", show = "
+        + Objects.toString(getShow())
+        + ", time_passed = "
+        + Objects.toString(getSinceStart())
+        + ", time_left = "
+        + Objects.toString(getTillEnd())
+        + "}";
   }
 
   /**

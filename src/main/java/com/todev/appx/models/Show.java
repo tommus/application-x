@@ -2,9 +2,8 @@ package com.todev.appx.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -82,37 +81,36 @@ public class Show {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getId(), getName(), getBrief(), getDuration());
+    return Objects.hash(getId(), getName(), getBrief(), getDuration());
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-
     if (obj == this) {
       return true;
     }
 
-    if (!(obj instanceof Show)) {
-      return false;
+    if (obj instanceof Show) {
+      final Show other = (Show) obj;
+
+      return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName()) && Objects.equals(
+          getBrief(), other.getBrief()) && Objects.equals(getDuration(), other.getDuration());
     }
 
-    final Show other = (Show) obj;
-
-    return Objects.equal(getId(), other.getId()) && Objects.equal(getName(), other.getName()) && Objects.equal(
-        getBrief(), other.getBrief()) && Objects.equal(getDuration(), other.getDuration());
+    return false;
   }
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(Program.class)
-        .add("id", getId())
-        .add("name", getName())
-        .add("brief", getBrief())
-        .add("duration", getDuration())
-        .toString();
+    return "Show {id = "
+        + Objects.toString(getId())
+        + ", name = "
+        + Objects.toString(getName())
+        + ", brief = "
+        + Objects.toString(getBrief())
+        + ", duration = "
+        + Objects.toString(getDuration())
+        + "}";
   }
 
   /**

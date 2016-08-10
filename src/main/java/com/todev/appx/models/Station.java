@@ -2,9 +2,8 @@ package com.todev.appx.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -64,31 +63,27 @@ public class Station {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getId(), getName());
+    return Objects.hash(getId(), getName());
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-
     if (obj == this) {
       return true;
     }
 
     if (!(obj instanceof Station)) {
-      return false;
+      final Station other = (Station) obj;
+
+      return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName());
     }
 
-    final Station other = (Station) obj;
-
-    return Objects.equal(getId(), other.getId()) && Objects.equal(getName(), other.getName());
+    return false;
   }
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(Station.class).add("id", getId()).add("name", getName()).toString();
+    return "Station {id = " + Objects.toString(getId()) + ", name = " + Objects.toString(getName()) + "}";
   }
 
   /**

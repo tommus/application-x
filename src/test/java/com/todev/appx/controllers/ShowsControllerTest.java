@@ -1,11 +1,11 @@
 package com.todev.appx.controllers;
 
-import com.google.common.collect.Lists;
 import com.todev.appx.models.Show;
 import com.todev.appx.repositories.ShowsRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -88,7 +88,7 @@ public class ShowsControllerTest extends JsonControllerTest {
    */
   @Test
   public void testValidItemsRetrieved() throws Exception {
-    final List<String> names = Lists.transform(shows, input -> input.getName());
+    final List<String> names = shows.stream().map(input -> input.getName()).collect(Collectors.toList());
 
     mockMvc.perform(get("/shows").accept(jsonContent).contentType(jsonContent))
         .andExpect(status().isOk())

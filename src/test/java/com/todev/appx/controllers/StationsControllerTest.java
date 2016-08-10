@@ -1,6 +1,5 @@
 package com.todev.appx.controllers;
 
-import com.google.common.collect.Lists;
 import com.todev.appx.controllers.StationsController.DeleteProgramScheduleBody;
 import com.todev.appx.controllers.StationsController.ProgramScheduleBody;
 import com.todev.appx.controllers.StationsController.UpdateProgramScheduleBody;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -107,7 +107,7 @@ public class StationsControllerTest extends JsonControllerTest {
    */
   @Test
   public void testValidItemsRetrieved() throws Exception {
-    final List<String> names = Lists.transform(stations, input -> input.getName());
+    final List<String> names = stations.stream().map(input -> input.getName()).collect(Collectors.toList());
 
     mockMvc.perform(get("/stations").accept(jsonContent).contentType(jsonContent))
         .andExpect(status().isOk())
