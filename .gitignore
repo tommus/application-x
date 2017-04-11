@@ -1,24 +1,10 @@
-### Java template
-*.class
-*.jar
-*.war
-*.ear
+### Java ###
+classes/
+target/
 
-### JetBrains template
+### Maven ###
+.mvn/
+
+### IntellijJ IDEA ###
 .idea/
-.idea_modules/
-/out/
-
-*.iws
-atlassian-ide-plugin.xml
-
-### Linux template
-*~
-.Trash-*
-
-### Misc template
-.gradle/
-build/
-
-### OS template
-.DS_Store
+*.iml

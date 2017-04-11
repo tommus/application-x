@@ -6,7 +6,7 @@ This application has been developed as a part of recruitment process.
 Compatibility
 -------------
 
-An application has been tested using `Java(TM) SE Runtime Environment (build 1.8.0_91-b14)`.
+An application has been tested using `Java(TM) SE Runtime Environment (build 1.8.0_121-b13)`.
 Despite this I encourage to test it on other versions of JVM.
 
 Project dependencies
@@ -24,7 +24,7 @@ This project uses:
 Compilation
 -----------
 
-Application can be compiled using `Gradle` build system. 
+Application can be compiled using `Maven` build system. 
 
 1. Open project directory:
 
@@ -32,17 +32,13 @@ Application can be compiled using `Gradle` build system.
 
 2. Compile project:
 
-    > gradle build
+    > maven clean package
 
-3. Execute:
+3. Execute REST API from `rest` module:
 
-    > java -jar build/libs/gs-rest-service-0.1.0.jar
+    > cd rest && mvn spring-boot:run
 
-4. To run unit tests, just type:
-
-    > gradle test
-
-Above has been assumed that, the alternatives to `gradle` and `java` executables are
+Above has been assumed that, the alternatives to `mvn` and `java` executables are
 available in system path.
 
 Goals
