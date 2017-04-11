@@ -37,7 +37,7 @@ class Station {
     return name;
   }
 
-  public static class Builder implements Supplier<Station> {
+  static class Builder implements Supplier<Station> {
 
     private UUID id;
 
@@ -47,12 +47,12 @@ class Station {
       super();
     }
 
-    public Builder withId(final UUID id) {
+    Builder withId(final UUID id) {
       this.id = id;
       return this;
     }
 
-    public Builder named(final String name) {
+    Builder named(final String name) {
       this.name = name;
       return this;
     }

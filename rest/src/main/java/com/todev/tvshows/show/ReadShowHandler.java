@@ -1,12 +1,13 @@
 package com.todev.tvshows.show;
 
+import com.todev.tvshows.exception.NotFoundException;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
-public class ReadShowHandler implements ReadShow.Handler {
+class ReadShowHandler implements ReadShow.Handler {
 
   private final ShowsRepository showsRepository;
 
@@ -17,6 +18,12 @@ public class ReadShowHandler implements ReadShow.Handler {
 
   @Override
   public Show apply(ReadShow command) {
-    return this.showsRepository.findOne(command.getId());
+    final Show show = this.showsRepository.findOne(command.getId());
+
+    if (show == null) {
+      throw new NotFoundException();
+    }
+
+    return show;
   }
 }

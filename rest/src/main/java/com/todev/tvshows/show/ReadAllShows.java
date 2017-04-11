@@ -6,7 +6,7 @@ import java.util.function.Function;
 class ReadAllShows {
 
   ReadAllShows(final Builder builder) {
-    // no-op.
+    super();
   }
 
   static BuilderProvider should() {

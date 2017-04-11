@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.todev.tvshows.common.ResponseBuilder.ok;
 import static com.todev.tvshows.station.ReadAllStations.should;
+import static java.util.Collections.unmodifiableCollection;
 import static java.util.function.UnaryOperator.identity;
 
 @RestController
@@ -23,8 +24,8 @@ class ReadAllStationsController {
   }
 
   @GetMapping
-  public ResponseEntity<?> stations() {
+  ResponseEntity<?> stations() {
     final Collection<Station> stations = should().readStations().using(this.reader);
-    return ok(stations, identity());
+    return ok(unmodifiableCollection(stations), identity());
   }
 }

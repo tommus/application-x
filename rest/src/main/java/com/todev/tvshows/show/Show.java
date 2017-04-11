@@ -53,7 +53,7 @@ class Show {
     return duration;
   }
 
-  public static class Builder implements Supplier<Show> {
+  static class Builder implements Supplier<Show> {
 
     private UUID id;
 
@@ -67,22 +67,22 @@ class Show {
       super();
     }
 
-    public Builder withId(final UUID id) {
+    Builder withId(final UUID id) {
       this.id = id;
       return this;
     }
 
-    public Builder named(final String name) {
+    Builder named(final String name) {
       this.name = name;
       return this;
     }
 
-    public Builder briefed(final String brief) {
+    Builder briefed(final String brief) {
       this.brief = brief;
       return this;
     }
 
-    public Builder lasting(final Integer duration) {
+    Builder lasting(final Integer duration) {
       this.duration = duration;
       return this;
     }

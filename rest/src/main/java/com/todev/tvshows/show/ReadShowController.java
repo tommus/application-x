@@ -1,5 +1,6 @@
 package com.todev.tvshows.show;
 
+import com.todev.tvshows.exception.BadRequestException;
 import com.todev.tvshows.exception.NotFoundException;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.todev.tvshows.common.ResponseBuilder.badRequest;
 import static com.todev.tvshows.common.ResponseBuilder.notFound;
-import static com.todev.tvshows.common.ResponseBuilder.ok;
 import static com.todev.tvshows.show.ReadShow.should;
-import static java.util.function.UnaryOperator.identity;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping(value = "/shows/{id}")
-public class ReadShowController {
+class ReadShowController {
 
   private final ReadShow.Handler reader;
 
@@ -26,12 +27,17 @@ public class ReadShowController {
   }
 
   @GetMapping
-  public ResponseEntity<?> show(@PathVariable UUID id) {
+  ResponseEntity<?> show(@PathVariable UUID id) {
+    Show show;
+
     try {
-      final Show show = should().readShow().withId(id).using(this.reader);
-      return ok(show, identity());
+      show = should().readShow().withId(id).using(this.reader);
+    } catch (BadRequestException e) {
+      return badRequest(e);
     } catch (NotFoundException e) {
       return notFound(e);
     }
+
+    return ok(show);
   }
 }

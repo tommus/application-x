@@ -2,15 +2,15 @@ package com.todev.tvshows.show;
 
 import com.todev.tvshows.exception.BadRequestException;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import static java.util.Optional.ofNullable;
 
-class ReadShow {
+class DeleteShow {
 
   private final UUID id;
 
-  ReadShow(final Builder builder) {
+  DeleteShow(final Builder builder) {
     this.id = ofNullable(builder.id).orElseThrow(BadRequestException::new);
   }
 
@@ -18,17 +18,17 @@ class ReadShow {
     return Builder::new;
   }
 
-  UUID getId() {
+  public UUID getId() {
     return id;
   }
 
   @FunctionalInterface
   interface BuilderProvider {
-    Builder readShow();
+    Builder deleteShow();
   }
 
   @FunctionalInterface
-  interface Handler extends Function<ReadShow, Show> {
+  interface Handler extends Consumer<DeleteShow> {
     // Empty by design.
   }
 
@@ -36,8 +36,8 @@ class ReadShow {
 
     private UUID id;
 
-    Show using(final Handler handler) {
-      return handler.apply(new ReadShow(this));
+    void using(final Handler handler) {
+      handler.accept(new DeleteShow(this));
     }
 
     Builder withId(final UUID id) {
