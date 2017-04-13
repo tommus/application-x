@@ -17,7 +17,7 @@ class ReadAllShowsHandler implements ReadAllShows.Handler {
   }
 
   @Override
-  public Collection<Show> apply(ReadAllShows command) {
+  public Collection<Show> get() {
     return this.showsRepository.findAll();
   }
 }

@@ -17,7 +17,7 @@ class ReadAllStationsHandler implements ReadAllStations.Handler {
   }
 
   @Override
-  public Collection<Station> apply(ReadAllStations command) {
+  public Collection<Station> get() {
     return this.stationsRepository.findAll();
   }
 }

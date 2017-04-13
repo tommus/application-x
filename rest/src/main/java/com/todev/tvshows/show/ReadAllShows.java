@@ -1,13 +1,9 @@
 package com.todev.tvshows.show;
 
 import java.util.Collection;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 class ReadAllShows {
-
-  ReadAllShows(final Builder builder) {
-    super();
-  }
 
   static BuilderProvider should() {
     return Builder::new;
@@ -19,14 +15,14 @@ class ReadAllShows {
   }
 
   @FunctionalInterface
-  interface Handler extends Function<ReadAllShows, Collection<Show>> {
+  interface Handler extends Supplier<Collection<Show>> {
     // Empty by design.
   }
 
   static class Builder {
 
     Collection<Show> using(final Handler handler) {
-      return handler.apply(new ReadAllShows(this));
+      return handler.get();
     }
   }
 }
