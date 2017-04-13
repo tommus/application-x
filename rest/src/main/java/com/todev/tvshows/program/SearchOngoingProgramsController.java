@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.todev.tvshows.common.ResponseBuilder.ok;
 import static com.todev.tvshows.program.SearchOngoingPrograms.should;
+import static java.time.LocalDateTime.of;
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.Optional.ofNullable;
 import static java.util.function.UnaryOperator.identity;
@@ -38,7 +39,7 @@ class SearchOngoingProgramsController {
 
     final LocalDate localDate = ofNullable(date).orElse(LocalDate.now());
     final LocalTime localTime = ofNullable(time).orElse(LocalTime.MIDNIGHT);
-    final LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+    final LocalDateTime localDateTime = of(localDate, localTime);
 
     final Collection<Program> programs = should().searchOngoingPrograms().at(localDateTime).using(this.reader);
     return ok(unmodifiableCollection(programs), identity());
