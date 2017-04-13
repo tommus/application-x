@@ -18,7 +18,7 @@ class DeleteShow {
     return Builder::new;
   }
 
-  public UUID getId() {
+  UUID getId() {
     return id;
   }
 

@@ -1,13 +1,12 @@
 package com.todev.tvshows.program;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.function.Supplier;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
 
 import static java.util.Optional.ofNullable;
 
@@ -20,8 +19,7 @@ class Program {
   private UUID id;
 
   @Column(name = "START_AT")
-  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-  private DateTime startAt;
+  private LocalDateTime startAt;
 
   public Program() {
     super();
@@ -40,7 +38,7 @@ class Program {
     return id;
   }
 
-  public DateTime getStartAt() {
+  public LocalDateTime getStartAt() {
     return startAt;
   }
 
@@ -53,14 +51,14 @@ class Program {
 
     private UUID id;
 
-    private DateTime startAt;
+    private LocalDateTime startAt;
 
     Builder withId(final UUID id) {
       this.id = id;
       return this;
     }
 
-    Builder startingAt(final DateTime startAt) {
+    Builder startingAt(final LocalDateTime startAt) {
       this.startAt = startAt;
       return this;
     }
