@@ -5,8 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.todev.tvshows")
@@ -19,14 +17,5 @@ public class TvShowsApplication extends SpringBootServletInitializer {
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
     return builder.sources(TvShowsApplication.class);
-  }
-
-  @RestController
-  class HelloController {
-
-    @RequestMapping("hello")
-    String hello() {
-      return "Hello there!";
-    }
   }
 }
