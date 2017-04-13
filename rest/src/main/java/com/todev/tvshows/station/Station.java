@@ -29,12 +29,21 @@ class Station {
     this.name = ofNullable(builder.name).orElseThrow(IllegalArgumentException::new);
   }
 
+  static BuilderProvider should() {
+    return Builder::new;
+  }
+
   public UUID getId() {
     return id;
   }
 
   public String getName() {
     return name;
+  }
+
+  @FunctionalInterface
+  interface BuilderProvider {
+    Builder prepareStation();
   }
 
   static class Builder implements Supplier<Station> {

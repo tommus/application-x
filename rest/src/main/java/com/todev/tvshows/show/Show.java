@@ -37,6 +37,10 @@ class Show {
     this.duration = ofNullable(builder.duration).orElse(0);
   }
 
+  static BuilderProvider should() {
+    return Builder::new;
+  }
+
   public UUID getId() {
     return id;
   }
@@ -51,6 +55,11 @@ class Show {
 
   public Integer getDuration() {
     return duration;
+  }
+
+  @FunctionalInterface
+  interface BuilderProvider {
+    Builder prepareShow();
   }
 
   static class Builder implements Supplier<Show> {
