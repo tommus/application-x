@@ -13,8 +13,8 @@ import static java.util.Optional.ofNullable;
 @Table(name = "SHOW")
 class Show {
 
-  @Column(name = "ID")
   @Id
+  @Column(name = "ID")
   private UUID id;
 
   @Column(name = "NAME")
@@ -71,10 +71,6 @@ class Show {
     private String brief;
 
     private Integer duration;
-
-    Builder() {
-      super();
-    }
 
     Builder withId(final UUID id) {
       this.id = id;
